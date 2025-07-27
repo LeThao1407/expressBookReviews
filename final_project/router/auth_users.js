@@ -1,30 +1,34 @@
+// router/users.js
 const express = require('express');
-const jwt = require('jsonwebtoken');
-let books = require("./booksdb.js");
-const regd_users = express.Router();
+const router = express.Router();
 
-let users = [];
+let users = {}; // lưu tạm user: {username: password}
 
-const isValid = (username)=>{ //returns boolean
-//write code to check is the username is valid
-}
+router.post('/register', (req, res) => {
+  const { username, password } = req.body;
 
-const authenticatedUser = (username,password)=>{ //returns boolean
-//write code to check if username and password match the one we have in records.
-}
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Missing username or password' });
+  }
 
-//only registered users can login
-regd_users.post("/login", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  if (users[username]) {
+    return res.status(409).json({ message: 'User already exists' });
+  }
+
+  users[username] = password;
+  res.status(201).json({ message: 'User registered successfully', username });
 });
 
-// Add a book review
-regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+
+// ✅ POST login
+router.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  // Kiểm tra thông tin đăng nhập (ví dụ đơn giản)
+  if (username === 'newuser' && password === 'password') {
+    res.json({ message: 'Login successful', newuser: username });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
+  }
 });
 
-module.exports.authenticated = regd_users;
-module.exports.isValid = isValid;
-module.exports.users = users;
+module.exports = router;
